@@ -1,0 +1,5 @@
+f oid 9990 sys_table
+f sys_table_dbname 0  sys_table
+f sys_table_name 0 sys_table
+f sys_table_owner 0 sys_table
+f sys_table_ro 0 sys_table

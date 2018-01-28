@@ -1,0 +1,6 @@
+f oid 9990 sys_user
+f sys_user_user 0 sys_user
+f sys_user_host 0 sys_user
+f sys_udflt_db 0 sys_user
+f sys_user_magic 1 sys_user
+f sys_user_passwd 0 sys_user

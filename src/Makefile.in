@@ -1,0 +1,147 @@
+# Makefile for Autoconf.
+# Copyright (C) 1992, 1993, 1994 Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+#### Start of system configuration section. ####
+
+CC=gcc
+LEX=flex
+srcdir = @srcdir@
+VPATH = @srcdir@
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+MAKEINFO = makeinfo
+TEXI2DVI = texi2dvi
+
+# Programs that are ALWAYS installed (and are created in the build dir).
+ASCRIPTS =  
+# All programs, including those only installed if you have perl.
+
+transform=@program_transform_name@
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+# Directory in which to install scripts.
+bindir = @bindir@
+
+# Directory in which to install library files.
+datadir = @datadir@
+acdatadir = $(datadir)/autoconf
+
+# Directory in which to install documentation info files.
+infodir = @infodir@
+
+#### End of system configuration section. ####
+
+SHELL = /bin/sh
+
+
+# Files that can be generated, but should be up to date for a distribution.
+DISTDEP = info Makefile
+# Files to distribute.
+DISTFILES = isql beagleb beagled 
+
+.INIT: sql.c
+all: ${DISTFILES} ${SCRIPTS} 
+
+INCLUDE =
+
+CLNTS = isql
+SERVS = beagled
+BACKEND = beagleb
+
+CFLAGS = @CPPFLAGS@
+
+HDR =
+CSRC = isql.c
+CXSRC = bsql.c connectTCP.c errexit.c linklist.c mymalloc.c
+
+SSRC = beagled.c
+SXSRC = passiveTCP.c 
+
+BSRC = beagleb.c
+BXSRC = $BXSRC parse.c filesys.c log.c bt_2bsql.c bt_data.c bt_disk.c bt_new.c bt_open.c store.c sockio.c getdate.c auth.c sr.c int_sql.c is.c sha1.c sha1core.c sql.c 
+
+CXOBJ = bsql.o connectTCP.o errexit.o linklist.o log.o mymalloc.o sha1.o sha1core.o 
+SXOBJ = passiveTCP.o errexit.o 
+BXOBJ = parse.o filesys.o log.o errexit.o linklist.o bt_2bsql.o bt_data.o bt_disk.o bt_new.o bt_open.o store.o sockio.o mymalloc.o getdate.o auth.o sr.o int_sql.o is.o sha1.o sha1core.o sql.o
+
+PROGS = ${CLNTS} ${SERVS} ${BACKEND}
+
+sql.c: sql.l
+	flex -t sql.l | sed -e 's/stderr,//g' -e 's/fprintf/lprintf/g' > sql.c
+
+${CLNTS}: ${CXOBJ}
+	${CC} -o ../bin/$@ ${CFLAGS} $@.o ${CXOBJ} @LIBS@
+
+${SERVS}: ${SXOBJ} 
+	${CC} -o ../bin/$@ ${CFLAGS} $@.o ${SXOBJ} @LIBS@
+
+${BACKEND}: ${BXOBJ}
+	${CC} -o ../bin/$@ ${CFLAGS} $@.o ${BXOBJ} @LIBS@
+
+clients: ${CLNTS}
+servers: ${SERVS}
+backend: ${BACKEND}
+
+clean: FRC
+	rm -f Makefile.bak a.out core errs lint.errs ../bin/${CLNTS} ../bin/${SERVS} ../bin/${BACKEND} *.o lex.yy.c
+
+depend: ${HDR} ${CSRC} ${SSRC} ${BSRC} ${TNSRC} FRC
+	maketd -a ${DEFS} ${INCLUDE} ${CSRC} ${SSRC} ${BSRC} ${TNSRC}
+
+install: all FRC
+	@echo "Your installation instructions here."
+
+lint: ${HDR} ${XSRC} ${CSRC} ${SSRC} ${BSRC} FRC
+	lint ${DEFS} ${INCLUDE} ${CSRC} ${SSRC} ${BSRC} ${CXSRC} ${SXSRC} ${BXSRC}
+
+print: Makefile ${SRC} FRC
+	lpr Makefile ${CSRC} ${SSRC} ${BSRC} ${CXSRC} ${SXSRC} ${BXSRC}
+
+spotless: clean FRC
+	rcsclean Makefile ${HDR} ${SRC}
+
+tags: ${CSRC} ${SSRC} ${BSRC} ${CXSRC} ${SXSRC} ${BXSRC}
+	ctags ${CSRC} ${SSRC} ${BSRC} ${CXSRC} ${SXSRC} ${BXSRC}
+
+isql: isql.o
+beagled: beagled.o
+beagleb: beagleb.o
+sql.o:sql.c
+
+FRC:
+	
+# DO NOT DELETE THIS LINE - maketd DEPENDS ON IT
+S=/usr/include/sys
+I=/usr/include
+
+isql.o: $I/stdio.h isql.c
+
+beagled.o: $I/netinet/in.h $I/stdio.h $S/errno.h $S/signal.h $S/types.h \
+	$S/wait.h beagled.c
+
+beagleb.o: $I/stdio.h beagleb.c
+distrib:
+	tar cvf BeagleDistrib.tar src/*.c src/*.h src/*.l src/*.y \
+        src/importdb src/exportdb data/sys_user \
+        data/sys_db data/sys_auth data/sys_type \
+        data/template src/*.sql bin/*.sh src/configure.in src/Makefile.in src/config.h.in src/configure  
+# *** Do not add anything here - It will go away. ***
+

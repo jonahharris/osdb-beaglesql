@@ -1,0 +1,29 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(beagleb.c)
+AC_CONFIG_HEADER(config.h)
+
+dnl Checks for programs.
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+
+dnl Checks for libraries.
+
+dnl Checks for header files.
+AC_HEADER_STDC
+AC_HEADER_SYS_WAIT
+AC_CHECK_HEADER(stdarg.h)
+AC_EGREP_CPP(inet_addr, /usr/include/arpa/inet.h,VALID_ARPA_INET_H=1,VALID_ARPA_INET_H=0)
+AC_CHECK_HEADERS(sys/time.h unistd.h)
+AC_TRY_LINK( [#include <sys/socket.h>] ,[socket(1,1,1);],,LIBS="$LIBS -lnsl -lsocket")
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_TYPE_SIZE_T
+AC_STRUCT_TM
+
+dnl Checks for library functions.
+AC_TYPE_SIGNAL
+AC_FUNC_VPRINTF
+AC_FUNC_WAIT3
+AC_CHECK_FUNCS(socket strcspn strerror strstr waitpid getdate)
+
+AC_OUTPUT(Makefile)

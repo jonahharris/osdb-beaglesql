@@ -1,0 +1,6 @@
+f oid 9990 sys_auth
+f sys_auth_db 0  sys_auth
+f sys_auth_table 0  sys_auth
+f sys_auth_field 0  sys_auth
+f sys_auth_user 0 sys_auth
+f sys_auth_flags 0 sys_auth
